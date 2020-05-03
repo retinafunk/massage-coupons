@@ -9,21 +9,8 @@ export namespace Components {
     interface CouponsShop {
         "targetURL": string;
     }
-    interface MyComponent {
-        /**
-          * The first name
-         */
-        "first": string;
-        /**
-          * The last name
-         */
-        "last": string;
-        /**
-          * The middle name
-         */
-        "middle": string;
-    }
     interface ShippingForm {
+        "onsendasletter": Function;
         "onsubmitted": Function;
     }
 }
@@ -34,12 +21,6 @@ declare global {
         prototype: HTMLCouponsShopElement;
         new (): HTMLCouponsShopElement;
     };
-    interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
-    }
-    var HTMLMyComponentElement: {
-        prototype: HTMLMyComponentElement;
-        new (): HTMLMyComponentElement;
-    };
     interface HTMLShippingFormElement extends Components.ShippingForm, HTMLStencilElement {
     }
     var HTMLShippingFormElement: {
@@ -48,7 +29,6 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "coupons-shop": HTMLCouponsShopElement;
-        "my-component": HTMLMyComponentElement;
         "shipping-form": HTMLShippingFormElement;
     }
 }
@@ -56,26 +36,12 @@ declare namespace LocalJSX {
     interface CouponsShop {
         "targetURL"?: string;
     }
-    interface MyComponent {
-        /**
-          * The first name
-         */
-        "first"?: string;
-        /**
-          * The last name
-         */
-        "last"?: string;
-        /**
-          * The middle name
-         */
-        "middle"?: string;
-    }
     interface ShippingForm {
+        "onsendasletter"?: Function;
         "onsubmitted"?: Function;
     }
     interface IntrinsicElements {
         "coupons-shop": CouponsShop;
-        "my-component": MyComponent;
         "shipping-form": ShippingForm;
     }
 }
@@ -84,7 +50,6 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "coupons-shop": LocalJSX.CouponsShop & JSXBase.HTMLAttributes<HTMLCouponsShopElement>;
-            "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
             "shipping-form": LocalJSX.ShippingForm & JSXBase.HTMLAttributes<HTMLShippingFormElement>;
         }
     }

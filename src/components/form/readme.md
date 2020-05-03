@@ -7,9 +7,10 @@
 
 ## Properties
 
-| Property      | Attribute | Description | Type       | Default     |
-| ------------- | --------- | ----------- | ---------- | ----------- |
-| `onsubmitted` | --        |             | `Function` | `undefined` |
+| Property         | Attribute | Description | Type       | Default     |
+| ---------------- | --------- | ----------- | ---------- | ----------- |
+| `onsendasletter` | --        |             | `Function` | `undefined` |
+| `onsubmitted`    | --        |             | `Function` | `undefined` |
 
 
 ## Dependencies
