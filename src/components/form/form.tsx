@@ -8,6 +8,7 @@ import Bouncer from 'formbouncerjs';
 })
 export class Form {
   @Prop() onsubmitted : Function;
+  @Prop() onsendasletter : Function;
   @Element() el:HTMLElement;
   @State() formData=[];
 
@@ -77,6 +78,10 @@ export class Form {
       this.onsubmitted(this.formData);
     }
   }
+  sendAsLetter(checked){
+    console.log('this.sendAsLetter()',checked);
+    this.onsendasletter(checked);
+  }
 
   render() {
     return (
@@ -87,28 +92,31 @@ export class Form {
               <label><input type="checkbox" id="send-via--post-service" name="agreeAgbs" required /> optional auch per Post senden!  </label>
             </div>*/}
             <label  htmlFor="gutscheineLocation">* In welcher Firma soll die Massage statt finden:</label>
-            <input id="gutscheineLocation" name="gutscheineLocation" placeholder="" type="text" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" value="test"  />
+            <input id="gutscheineLocation" name="gutscheineLocation" placeholder="" type="text" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" value=""  />
             <label htmlFor="couponMessage">Nachrichtenfeld für spezielle Wünsche:</label>
             <textarea  name="couponMessage" id="couponMessage" placeholder="Ihre Nachricht..." class="shadow appearance-none border rounded w-full py-2 px-3* text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4">    </textarea>
             <label htmlFor="couponEmail">*Email</label>
-            <input id="couponEmail" name="couponEmail"  type="email" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" value={"xx@res.de"}/>
+            <input id="couponEmail" name="couponEmail"  type="email" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" value={""}/>
             <label htmlFor="couponEmailConfirm">*Email bestätigen</label>
-            <input id="couponEmailConfirm" name="couponEmailConfirm"  type="email" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" value={"xx@res.de"} />
+            <input id="couponEmailConfirm" name="couponEmailConfirm"  type="email" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" value={""} />
             <h2 class="text-xl">Lieferadresse, Rechnungsadresse:</h2>
             <label htmlFor="shippingCompany">*Firma:</label>
-            <input id="shippingCompany" name="shippingCompany"  type="text" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" value={"test"}/>
+            <input id="shippingCompany" name="shippingCompany"  type="text" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" value={""}/>
             <label htmlFor="surname">*Vorname:</label>
-            <input id="surname" name="surname"  type="text" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4"  value={"test"}/>
+            <input id="surname" name="surname"  type="text" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4"  value={""}/>
             <label htmlFor="familyname">*Nachname:</label>
-            <input id="familyname" name="familyname"  type="text" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4"  value={"test"}/>
+            <input id="familyname" name="familyname"  type="text" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4"  value={""}/>
             <label htmlFor="street">*Strasse & Nr:</label>
-            <input id="street" name="street"  type="text" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4"  value={"test"}/>
+            <input id="street" name="street"  type="text" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4"  value={""}/>
             <label htmlFor="plz">*PLZ:</label>
-            <input id="plz" name="plz" type="number" min="1000" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4"  value={"12345"}/>
+            <input id="plz" name="plz" type="number" min="1000" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4"  value={""}/>
             <label htmlFor="city">*Stadt:</label>
-            <input id="city" name="city"  type="text" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4"  value={"test"}/>
+            <input id="city" name="city"  type="text" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4"  value={""}/>
             <div>
-              <label><input type="checkbox" id="agree-agbs" name="agreeAgbs" required />* Ich bin bin mit den <a href="#agbs">AGBs/Rückgabe </a> und Datenschutz einverstanden  </label>
+              <label><input type="checkbox" id="send-as-letter" name="send-as-letter" onClick={evt=>this.sendAsLetter(evt.target['checked'])}  /> optional Gutscheine per Post senden ( zusätzlich 1.5€ Versandkosten) </label>
+            </div>
+            <div>
+              <label><input type="checkbox" id="agree-agbs" name="agreeAgbs" required /> * Ich bin bin mit den <a href="#agbs">AGBs/Rückgabe </a> und Datenschutz einverstanden  </label>
             </div>
             <div class="pt-4" >
 
