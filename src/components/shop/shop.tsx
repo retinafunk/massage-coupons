@@ -21,6 +21,10 @@ export class Shop {
   @State() currentAmount = 1;
   @State() isCheckout = false;
   @State() isPayed = false;
+  @State() isSendAsLetter = false;
+  //@State() isPayed = true;
+  @State() currentMessage= '';
+  #currentCompany= '';
 
   formData=[];
 
@@ -31,7 +35,7 @@ export class Shop {
       let coupon = {
         id: uniqid(),
         price: this.currentPrice,
-        message: ''
+        message: this.currentMessage
       };
       this.coupons = [...this.coupons, coupon];
     }
@@ -51,8 +55,10 @@ export class Shop {
     this.totalPrice = this.coupons.reduce((total, current, index, array) => {
       let i = index;
       console.log(i);
+      let shippingCosts = 0;
+      if(this.isSendAsLetter) shippingCosts += 1.5;
       if (array.length === 0) return 0;
-      return total += current.price;
+      return total += (current.price + shippingCosts);
     }, 0);
   }
 
@@ -60,25 +66,37 @@ export class Shop {
     evt.preventDefault();
     const doc = new jsPDF();
     let posY = 20;
-    let posIncLine = 18;
+    let posIncLine = 10;
     let posIncBlock = 20;
     let counter = 0;
     this.coupons.map(coupon => {
-      if (counter % 4 === 0 && counter > 0) {
+      posY = 0;
+      if (counter > 0) {
         doc.addPage();
-        posY = 20;
+        posY = 0;
       }
+      let msg = '';
+      if(coupon.message.length>2) msg = coupon.message;
       doc.setFontSize(30)
+        .addImage(document.getElementById('coupon-image'),0,posY,210,70)
         .setFontType('bold')
-        .text(`Gutschein`, 10, posY)
-        .setFontSize(20)
-        .setFontType('normal')
-        .text(`für eine mobile Massage in Wert von : ${coupon.price}€`, 10, posY += posIncLine)
-        .setFontSize(12)
-        .text(`Gutschein Code: ${coupon.message}`, 10, posY += posIncLine)
+        .setFontSize(18)
+        .text(`für eine Massage bei :  ${this.#currentCompany}`, 10, posY + 80 )
+        .setFontSize(16)
+        .setFontType('bold')
+        .text(`Gutscheinwert : ${coupon.price}€`, 10, posY += posIncLine + 80 );
+        if(msg.length>1){
+        doc.setFontSize(14)
+            .setFontType('normal')
+            .text(`${msg}`, 10, posY += posIncLine )
+        }
+        doc.setFontSize(12)
+        .text(`Gültigkeit: 1 Jahr`, 10, posY += posIncLine)
+        .text(`Code: ${coupon.id}`, 10, posY += posIncLine)
       posY += posIncLine;
-      doc.setLineDash([3, 2], 0)
-        .line(0, posY, 300, posY, 'S');
+/*      doc.setLineDash([3, 2], 0)
+        .line(0, posY, 300, posY, 'S');*/
+
       posY += posIncBlock;
       counter++;
     });
@@ -123,6 +141,7 @@ export class Shop {
   onFormSubmitted(payload:any){
     console.log('shop onFormSubmitted() payload : ',payload);
     this.formData=[...payload];
+    this.#currentCompany = this.formData[0]['value'];
     this.checkout();
   }
 
@@ -158,48 +177,69 @@ export class Shop {
        this.coupons = [...this.coupons];
     });
   }
+  updateCurrentPersonalizedMessage(value:string){
+
+    this.currentMessage = value;
+    console.log('updateCurrentPersonalizedMessage',this.currentMessage);
+  }
+  sendAsletter(checked){
+    console.log('App - sendAsletter() ',checked);
+    this.isSendAsLetter = checked;
+    this.calculateTotalPrice();
+    console.log('App -   this.totalPrice ',  this.totalPrice);
+
+  }
   render() {
     return (
       <Host >
-
-        <div class='container mx-auto border p-4'>
+        <link rel="stylesheet" href="https://unpkg.com/balloon-css/balloon.min.css" />
+        <div  class='container mx-auto border p-4'>
           <slot name="cta-1"></slot>
           <div class="mt-4"> </div>
-          {
-            !this.isCheckout && !this.isPayed ?
-              <div>
-                <label class={"inline"} htmlFor="price-input"> Anzahl:</label>
-                <input id={"amount-input"}
-                       class="inline shadow appearance-none border rounded w-20 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mr-4"
-                       type="number" min="1" max="100" value={this.currentAmount}
-                       onInput={evt => this.currentAmount = parseInt(evt.target['value'])}/>
-                <label class={"inline"} htmlFor="price-input"> Wert: </label>
-                <input id={"price-input"}
-                       class="inline shadow appearance-none border rounded w-20 py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mr-4"
-                       type="number" value={this.currentPrice}
-                       onInput={evt => this.currentPrice = parseInt(evt.target['value'])}/> €
-                <button
-                  class="block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-2"
-                  onClick={(evt) => this.addCoupons(evt)}>{this.currentAmount} {this.currentAmount > 1 ? 'Gutscheine' : 'Gutschein'} in
-                  Wert von {this.currentPrice}€ Zum Warenkorb hinzufügen.
-                </button>
-              </div>
-              : <div> </div>
-          }
-          <div class={'shopping-cart p-4 flex flex-wrap'}>
-            {this.coupons.map(coupon =>
-              <div class={"coupon-item  border p-2 mr-2 rounded mb-2 w-full flex items-center justify-between whitespace-no-wrap"} key={coupon.id}>{'Gutschein: ' + coupon.price + '€'}
-                <input type="text" name="personalized" placeholder="personlicher Gutscheintext" class="inline shadow appearance-none border rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mx-4 " style={{width:'25 0px'}} onBlur={evt=>{this.updatePersonalizedMessage(evt.target,coupon.id)}} />
-                <button class="border rounded p-1 ml-2 rounded-b" onClick={evt => this.deleteCoupon(evt, coupon.id)} disabled={this.isPayed}>
-                  <ion-icon name="trash"> </ion-icon>
-                </button>
-              </div>
-            )}
+          <div class="md:grid  md:grid-cols-3 md:gap-4 w-full">
+
+            {
+              !this.isCheckout && !this.isPayed ?
+                <div class="col-span-2">
+                  <label class={"inline"} htmlFor="price-input"> Anzahl:</label>
+                  <input id={"amount-input"}
+                         class="inline shadow appearance-none border rounded w-10 md:w-20 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mr-4 font-bold"
+                         type="number" min="1" max="100" value={this.currentAmount}
+                         onInput={evt => this.currentAmount = parseInt(evt.target['value'])}/>
+                  <label class={"inline"} htmlFor="price-input"> Wert: </label>
+                  <input id={"price-input"}
+                         class="inline shadow appearance-none border rounded w-16  md:w-20 py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mr-4 font-bold"
+                         type="number" value={this.currentPrice}
+                         onInput={evt => this.currentPrice = parseInt(evt.target['value'])}/> €
+                  <input type="text" name="personalized-message" placeholder="personlicher Gutscheintext (optional)" class="inline shadow appearance-none border rounded w-1/2 py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline md:mx-4 mt-2 w-full md:w-1/2 " style={{width:'25 0px'}} onBlur={evt=>{this.updateCurrentPersonalizedMessage(evt.target['value'])}}  />
+                  <button aria-label="Gutscheine erzeugen!" data-balloon-pos="down"
+                    class="block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline my-2"
+                    onClick={(evt) => this.addCoupons(evt)}>{this.currentAmount} {this.currentAmount > 1 ? 'Gutscheine' : 'Gutschein'} in
+                    Wert von {this.currentPrice}€ Zum Warenkorb hinzufügen.
+                  </button>
+                </div>
+                : <div> </div>
+            }
+            <img id="coupon-image" class="w-full h-32" src="https://www.mobile-massagen-duesseldorf.de/site/templates/images/coupon-image.jpg" alt=""/>
           </div>
-          <div class="text-xl">
+
+
+
+          <div class={'shopping-cart p-4 flex flex-wrap'}>
+            <div> <ion-icon name="cart" size="large"> </ion-icon> </div>
+            {!this.isCheckout && !this.isPayed ? this.coupons.map(coupon =>
+              <div class={"coupon-item relative  border p-2 mr-2 rounded mb-2 w-full md:flex items-center justify-between whitespace-no-wrap"} key={coupon.id}>Gutschein:&nbsp; <strong>{'' + coupon.price + '€'}</strong>
+                <input type="text" name="personalized" placeholder="personlicher Gutscheintext (optional)" class="block md:inline shadow appearance-none border rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline md:mx-4 mt-4 md:mt-auto  " style={{width:'25 0px'}} onBlur={evt=>{this.updatePersonalizedMessage(evt.target,coupon.id)}} value={coupon.message.length>1 ? coupon.message : this.currentMessage} />
+                <button class="border rounded p-1 ml-2 rounded-b absolute right-0 top-0 m-2 md:m-auto md:static" onClick={evt => this.deleteCoupon(evt, coupon.id)} disabled={this.isPayed} >
+                  <ion-icon name="trash" aria-label="Gutschein löschen!" data-balloon-pos="up"> </ion-icon>
+                </button>
+              </div>
+            ) : <div> </div>}
+          </div>
+          <div class="text-xl ml-4">
             Anzahl Gutscheine: <strong>{this.coupons.length}</strong>
           </div>
-          <div class="text-xl">
+          <div class="text-xl  ml-4">
             Preis insgesamt : <strong>{this.totalPrice} €</strong>
           </div>
 
@@ -207,13 +247,15 @@ export class Shop {
 
           {
             this.totalPrice>10 && !this.isCheckout  ?
-              <shipping-form onsubmitted={(data)=>this.onFormSubmitted(data)}></shipping-form>
+              <shipping-form onsubmitted={(data)=>this.onFormSubmitted(data)} onsendasletter={(checked)=>this.sendAsletter(checked)}> </shipping-form>
               :
               <div> </div>
           }
-          {this.isPayed ? <button
+          {this.isPayed && !this.isSendAsLetter ? <div> <p> <br/> <strong>Juhuu – Der Bestellvorgang Ihres Massage Wertgutscheins war erfolgreich!</strong><br/> Vielen Dank für Ihre Bestellung und viel Spaß beim Verschenken! <br/><br/>
+            Ihr Sarula Massage Team<br/> <br/>
+          </p> <button
             class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            onClick={evt => this.renderCouponsPDFs(evt)}>PDFs erzeugen!</button> : <div></div>}
+            onClick={evt => this.renderCouponsPDFs(evt)}>PDFs erzeugen!</button> </div> : <div></div>}
         </div>
         {
           !this.isPayed  ?
