@@ -9,6 +9,7 @@ import Bouncer from 'formbouncerjs';
 export class Form {
   @Prop() onsubmitted : Function;
   @Prop() onsendasletter : Function;
+  @Prop() onshowagbs : Function;
   @Element() el:HTMLElement;
   @State() formData=[];
 
@@ -82,6 +83,10 @@ export class Form {
     console.log('this.sendAsLetter()',checked);
     this.onsendasletter(checked);
   }
+  showAgbs(){
+    console.log('this.showAgbs()');
+    this.onshowagbs();
+  }
 
   render() {
     return (
@@ -116,7 +121,7 @@ export class Form {
               <label><input type="checkbox" id="send-as-letter" name="send-as-letter" onClick={evt=>this.sendAsLetter(evt.target['checked'])}  /> optional Gutscheine per Post senden ( zusätzlich 1.5€ Versandkosten) </label>
             </div>
             <div>
-              <label><input type="checkbox" id="agree-agbs" name="agreeAgbs" required /> * Ich bin bin mit den <a href="#agbs">AGBs/Rückgabe </a> und Datenschutz einverstanden  </label>
+              <label><input type="checkbox" id="agree-agbs" name="agreeAgbs" required /> * Ich bin bin mit den <strong  onClick={()=>this.showAgbs()}>AGBs/Rückgabe </strong> und Datenschutz einverstanden  </label>
             </div>
             <div class="pt-4" >
 

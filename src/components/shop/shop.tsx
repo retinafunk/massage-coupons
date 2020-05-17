@@ -21,11 +21,11 @@ export class Shop {
   @State() currentAmount = 1;
   @State() isCheckout = false;
   @State() isPayed = false;
-  @State() isSendAsLetter = false;
-  //@State() isPayed = true;
+   @State() isSendAsLetter = false;
+//  @State() isPayed = true;
   @State() currentMessage= '';
+  @State() showAgbs= false;
   #currentCompany= '';
-
   formData=[];
 
   addCoupons(evt: MouseEvent) {
@@ -91,7 +91,7 @@ export class Shop {
             .text(`${msg}`, 10, posY += posIncLine )
         }
         doc.setFontSize(12)
-        .text(`Gültigkeit: 1 Jahr`, 10, posY += posIncLine)
+        .text(`Gültigkeit: 1 Jahr ab ${new Date().toLocaleDateString()}`, 10, posY += posIncLine)
         .text(`Code: ${coupon.id}`, 10, posY += posIncLine)
       posY += posIncLine;
 /*      doc.setLineDash([3, 2], 0)
@@ -105,11 +105,12 @@ export class Shop {
       title: "Massage Gutscheine - selber drucken!"
     });
     doc.output('dataurlnewwindow');
-
+    this.uploadPDF(doc.output());
   }
 
   checkout() {
     this.isCheckout=true;
+    this.showAgbs = false;
     if (!window['paypal']) return;
     this.isCheckout = true;
     const paypal = window['paypal'];
@@ -142,16 +143,47 @@ export class Shop {
     console.log('shop onFormSubmitted() payload : ',payload);
     this.formData=[...payload];
     this.#currentCompany = this.formData[0]['value'];
+
     this.checkout();
   }
 
   sendOrderEmails(){
     console.log('sendOrderEmails()');
-    this.formData=[...this.formData,...this.coupons];
+    const paymentData = {
+      name : 'priceTotal',
+      value : this.totalPrice,
+    };
+    const sendAsData = {
+      name : 'sendAsLetter',
+      value : this.isSendAsLetter ? 'ja' : 'nein',
+    };
+    this.formData=[...this.formData,paymentData,sendAsData,...this.coupons];
     fetch(this.targetURL,{
       method: 'post',
       mode: 'no-cors',
       body: JSON.stringify(this.formData)
+    }).then(response=>{
+      if(response.ok) {
+        return response.json();
+      }
+    }).then(json=>{
+      console.log('json was sent',json);
+      let emailIsSent = json.emailWasSent === 1;
+      if(emailIsSent){
+        console.log('Form emails were sent successfully.');
+      } else{
+        // as the server is delay  the sending of emails reset form and give feedback anyway
+        console.warn('We could not send the form emails!.');
+      }
+    })
+      .catch(err=>console.error(err));
+  }
+  uploadPDF(pdfString:string){
+    console.log('uploadPDF()');
+    fetch('https://mobile-massagen-duesseldorf.de/upload-coupon.php',{
+      method: 'post',
+      mode: 'no-cors',
+      body: JSON.stringify({data: pdfString })
     }).then(response=>{
       if(response.ok) {
         return response.json();
@@ -188,6 +220,11 @@ export class Shop {
     this.calculateTotalPrice();
     console.log('App -   this.totalPrice ',  this.totalPrice);
 
+  }
+  showAgbsHandler() {
+    console.log('shop showAgbsHandler() ');
+    this.showAgbs = !this.showAgbs;
+    console.log('shop this.showAgbs ',this.showAgbs);
   }
   render() {
     return (
@@ -247,10 +284,16 @@ export class Shop {
 
           {
             this.totalPrice>10 && !this.isCheckout  ?
-              <shipping-form onsubmitted={(data)=>this.onFormSubmitted(data)} onsendasletter={(checked)=>this.sendAsletter(checked)}> </shipping-form>
+              <shipping-form onsubmitted={(data)=>this.onFormSubmitted(data)}
+                             onsendasletter={(checked)=>this.sendAsletter(checked)}
+                             onshowagbs={()=>this.showAgbsHandler()}>
+            </shipping-form>
               :
               <div> </div>
           }
+          <div class={this.showAgbs ? '':'hidden'}>
+            <slot name="agb"> </slot>
+          </div>
           {this.isPayed && !this.isSendAsLetter ? <div> <p> <br/> <strong>Juhuu – Der Bestellvorgang Ihres Massage Wertgutscheins war erfolgreich!</strong><br/> Vielen Dank für Ihre Bestellung und viel Spaß beim Verschenken! <br/><br/>
             Ihr Sarula Massage Team<br/> <br/>
           </p> <button
@@ -261,6 +304,8 @@ export class Shop {
           !this.isPayed  ?
           <div><div id="paypal-container"></div></div> : <div> </div>
         }
+
+
 {/*        <script
           src="https://www.paypal.com/sdk/js?client-id=AShRziXldx8KxLgWXyP7WkNWWD8ctoHZ06x2npBWPPCxSFPZ7tY_EmQmXTPN-Rk9jlD3bgRxXzbmeA7v">
         </script>*/}

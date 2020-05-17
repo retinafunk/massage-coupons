@@ -11,6 +11,7 @@ export namespace Components {
     }
     interface ShippingForm {
         "onsendasletter": Function;
+        "onshowagbs": Function;
         "onsubmitted": Function;
     }
 }
@@ -38,6 +39,7 @@ declare namespace LocalJSX {
     }
     interface ShippingForm {
         "onsendasletter"?: Function;
+        "onshowagbs"?: Function;
         "onsubmitted"?: Function;
     }
     interface IntrinsicElements {
