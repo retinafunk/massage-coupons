@@ -10,6 +10,7 @@
 | Property         | Attribute | Description | Type       | Default     |
 | ---------------- | --------- | ----------- | ---------- | ----------- |
 | `onsendasletter` | --        |             | `Function` | `undefined` |
+| `onshowagbs`     | --        |             | `Function` | `undefined` |
 | `onsubmitted`    | --        |             | `Function` | `undefined` |
 
 
