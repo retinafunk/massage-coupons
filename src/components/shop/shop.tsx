@@ -79,28 +79,31 @@ export class Shop {
       let msg = '';
       if (coupon.message.length > 2) msg = coupon.message;
       doc.setFontSize(30)
-        .addImage(document.getElementById('coupon-image'), 0, posY, 210, 70)
+        .addImage(document.getElementById('coupon-image'), 0, posY, 210, 120)
         .setFontType('bold')
         .setFontSize(18)
-        .text(`für eine Massage bei :  ${this.#currentCompany}`, 10, posY + 80)
+        .text(`WERTGUTSCHEIN FÜR EINE MASSAGE`, 10, posY + 130)
+        .text(`AM ARBEITSPLATZ BEI :  ${this.#currentCompany}`, 10, posY + 140)
         .setFontSize(16)
         .setFontType('bold')
-        .text(`Gutscheinwert : ${coupon.price}€`, 10, posY += posIncLine + 80);
+        .text(`GUTSCHEINWERT : ${coupon.price}€`, 10, posY += posIncLine + 160);
       if (msg.length > 1) {
         doc.setFontSize(14)
           .setFontType('normal')
           .text(`${msg}`, 10, posY += posIncLine)
       }
       doc.setFontSize(12)
-        .text(`Gültigkeit: 1 Jahr ab ${new Date().toLocaleDateString()}`, 10, posY += posIncLine)
-        .text(`Code: ${coupon.id}`, 10, posY += posIncLine)
+        .text(`GÜLTIGKEIT: 1 JAHR AB ${new Date().toLocaleDateString()}`, 10, posY += posIncLine)
+        .text(`CODE: ${coupon.id}`, 10, posY += posIncLine)
       posY += posIncLine;
       /*      doc.setLineDash([3, 2], 0)
               .line(0, posY, 300, posY, 'S');*/
 
       posY += posIncBlock;
       counter++;
+      doc.addImage(document.getElementById('coupon-image-footer'), 0, 220, 210, 70)
     });
+
     // doc.save('massage-gutscheine.pdf');
     doc.setProperties({
       title: "Massage Gutscheine - selber drucken!"
@@ -273,8 +276,10 @@ export class Shop {
                 </div>
                 : <div></div>
             }
-            <img id="coupon-image" class="w-full h-32"
-                 src="https://www.mobile-massagen-duesseldorf.de/site/templates/images/coupon-image.jpg" alt=""/>
+            <img id="coupon-image" class="w-full h-36"
+                 src="https://www.mobile-massagen-duesseldorf.de/site/templates/images/coupon-header.jpg" alt=""/>
+                 <img id="coupon-image-footer" class="w-full h-32 invisible"
+                 src="https://www.mobile-massagen-duesseldorf.de/site/templates/images/coupon-footer.jpg" alt=""/>
           </div>
 
 
