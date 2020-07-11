@@ -145,7 +145,10 @@ export class Shop {
 
   onFormSubmitted(payload: any) {
     console.log('shop onFormSubmitted() payload : ', payload);
-    const confirmMessage = `Wenn Sie mit Ihrer Gutscheinbestellung im Wert von ${this.totalPrice} Euro fertig sind klicken Sie bitte jetzt auf „OK" und gehen Sie weiter zur Bestellung. Danach kann die Bestellung nicht mehr verändert werden! Falls Sie Ihrer Bestellung  verändern möchten klicken Sie jetzt auf „Abbrechen".`;
+    const confirmMessage =`
+Wenn Sie mit Ihrer Gutscheinbestellung im Wert von ${this.totalPrice} Euro fertig sind, klicken Sie jetzt bitte auf „OK“ und gehen Sie weiter zur Bezahlung.
+Danach kann die Bestellung nicht mehr verändert werden! Falls Sie Ihre Bestellung verändern möchten klicken Sie jetzt bitte auf“Abbrechen“.
+`;
     if (!window.confirm(confirmMessage)) {
       return false;
     }
@@ -276,10 +279,12 @@ export class Shop {
                 </div>
                 : <div></div>
             }
-            <img id="coupon-image" class="w-full h-36"
-                 src="https://www.mobile-massagen-duesseldorf.de/site/templates/images/coupon-header.jpg" alt=""/>
-                 <img id="coupon-image-footer" class="w-full h-32 invisible"
-                 src="https://www.mobile-massagen-duesseldorf.de/site/templates/images/coupon-footer.jpg" alt=""/>
+            <div>
+              <img id="coupon-image" class="w-full h-0"
+                   src="https://www.mobile-massagen-duesseldorf.de/site/templates/images/coupon-header.jpg" alt=""/>
+              <img id="coupon-image-footer" class="w-full invisible"
+                   src="https://www.mobile-massagen-duesseldorf.de/site/templates/images/coupon-footer.jpg" alt=""/>
+            </div>
           </div>
 
 
@@ -347,7 +352,7 @@ export class Shop {
           src="https://www.paypal.com/sdk/js?client-id=AShRziXldx8KxLgWXyP7WkNWWD8ctoHZ06x2npBWPPCxSFPZ7tY_EmQmXTPN-Rk9jlD3bgRxXzbmeA7v">
         </script>*/}
         <script
-          src="https://www.paypal.com/sdk/js?client-id=Ae0eGEX3LaAYLpBCYLgUC8y-28RcsXqmDzmNW-uVcJnUaM39V3uHxUblsLLdrCJcuCYUK_9H74OKht5f">
+          src="https://www.paypal.com/sdk/js?client-id=AeFD1ehBBgfOSa7yxMpuIHkDUJ3VNUCgLYvqslEXcDk99Mn5qTdF2Xcfbw3USvuxIVFbFZ87YHottB51&currency=EUR">
         </script>
         {/*        <button
           class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
