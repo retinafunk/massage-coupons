@@ -26,6 +26,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "formbouncerjs": "^1.4.6",
     "jspdf": "^1.5.3"
   }
 }
